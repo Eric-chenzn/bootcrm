@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+    <!--读取db.properties-->
+    <context:property-placeholder location="classpath:db.properties"/>
+    <!--配置数据源-->
+    <bean id="dataSource" class="org.apache.commons.dbcp2.BasicDataSource">
+        <!--数据库驱动-->
+        <property name="driverClassName" value="${jdbc.driver}"/>
+        <property name="url" value="${jdbc.url}"/>
+        <property name="username" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+        <!--最大连接数-->
+        <property name="maxTotal" value="${jdbc.maxTotal}"/>
+        <!--最大空闲链接-->
+        <property name="maxIdle" value="${jdbc.maxIdle}"/>
+        <!--初始化链接-->
+        <property name="initialSize" value="${jdbc.initialSize}"/>
+    </bean>
+    <!--配置事物管理器-->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <!--注入数据源-->
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+
+
+    <!--配置mybatis的工厂-->
+    <bean class="org.mybatis.spring.SqlSessionFactoryBean">
+        <!--注入数据源-->
+        <property name="dataSource" ref="dataSource"/>
+        <!--配置mybatis配置文件的位置-->
+        <property name="configLocation" value="classpath:mybatis-config.xml"/>
+    </bean>
+
+    <!--借口开发，配置dao层扫描器，写在此包下的借口将会被扫描到-->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.itchenzn.bootcrm.dao"/>
+    </bean>
+
+    <!--配置扫描@Service的注解-->
+    <context:component-scan base-package="com.itchenzn.bootcrm.service"/>
+
+</beans>
